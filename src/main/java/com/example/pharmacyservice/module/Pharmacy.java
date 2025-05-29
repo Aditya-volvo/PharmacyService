@@ -1,16 +1,14 @@
 package com.example.pharmacyservice.module;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "pharmacy_table")
+@Table(name = "pharmacy_table",
+uniqueConstraints = @UniqueConstraint(columnNames = "admin_id"))
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
