@@ -4,7 +4,7 @@ import com.example.pharmacyservice.dto.PharmacyRequest;
 import com.example.pharmacyservice.dto.PharmacyResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+
 
 import java.util.List;
 
