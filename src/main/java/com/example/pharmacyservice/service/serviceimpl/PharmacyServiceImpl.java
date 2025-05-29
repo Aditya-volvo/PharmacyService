@@ -1,5 +1,6 @@
 package com.example.pharmacyservice.service.serviceimpl;
 
+import com.example.pharmacyservice.client.AdminClient;
 import com.example.pharmacyservice.dto.PharmacyRequest;
 import com.example.pharmacyservice.dto.PharmacyResponse;
 import com.example.pharmacyservice.exception.PharmacyNotFoundException;
@@ -21,9 +22,18 @@ public class PharmacyServiceImpl implements PharmacyService {
     private final PharmacyRepository pharmacyRepository;
     private  final GlobalMapper globalMapper;
     private final GlobalResponseEntity globalResponseEntity;
+    private final AdminClient adminClient;
 
     @Override
     public ResponseEntity<PharmacyResponse> registerPharmacy(PharmacyRequest pharmacyRequest) {
+//Ensure the Admin exists (Feign call toAuth service)
+        adminClient.getAdminById(pharmacyRequest.getAdminId());
+//        Enfore one-to-one : on other pharmacy for this admin
+        if(pharmacyRepository.existsByAdminId(pharmacyRequest.getAdminId())){
+            throw new IllegalStateException(
+                    "Admin"+ pharmacyRequest.getAdminId()+" already has a pharmacy");
+        }
+
         Pharmacy pharmacy = Pharmacy.builder()
                 .pharmacyId(pharmacyRequest.getPharmacyId())
                 .pharmacyName(pharmacyRequest.getPharmacyName())
