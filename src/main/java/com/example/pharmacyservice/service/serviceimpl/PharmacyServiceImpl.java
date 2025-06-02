@@ -1,6 +1,8 @@
 package com.example.pharmacyservice.service.serviceimpl;
 
 import com.example.pharmacyservice.client.AdminClient;
+import com.example.pharmacyservice.client.MedicalClient;
+import com.example.pharmacyservice.dto.MedicalDto;
 import com.example.pharmacyservice.dto.PharmacyRequest;
 import com.example.pharmacyservice.dto.PharmacyResponse;
 import com.example.pharmacyservice.exception.PharmacyNotFoundException;
@@ -18,11 +20,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PharmacyServiceImpl implements PharmacyService {
+public class PharmacyServiceImpl implements PharmacyService , MedicalClient {
     private final PharmacyRepository pharmacyRepository;
     private  final GlobalMapper globalMapper;
     private final GlobalResponseEntity globalResponseEntity;
     private final AdminClient adminClient;
+    private final MedicalClient medicalClient;
 
     @Override
     public ResponseEntity<PharmacyResponse> registerPharmacy(PharmacyRequest pharmacyRequest) {
@@ -78,5 +81,15 @@ public class PharmacyServiceImpl implements PharmacyService {
         Pharmacy pharmacy = pharmacyRepository.findById(pharmacyId).orElseThrow(()->new PharmacyNotFoundException("Pharmacy with Id :"+pharmacyId+"Not Found"));
         pharmacyRepository.delete( pharmacy);
         return "Pharmacy with id : "+pharmacyId+" is deleted";
+    }
+
+    @Override
+    public List<MedicalDto> getMedicinesByPharmacyId(Long pharmacyId) {
+        // Ensure the pharmacy exists
+        pharmacyRepository.findById(String.valueOf(pharmacyId))
+                .orElseThrow(() -> new PharmacyNotFoundException("Pharmacy with ID: " + pharmacyId + " Not Found"));
+
+        // Call the MedicalClient to get medicines by pharmacy ID
+        return medicalClient.getMedicinesByPharmacyId(pharmacyId);
     }
 }
