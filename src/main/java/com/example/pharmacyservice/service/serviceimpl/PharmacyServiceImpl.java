@@ -2,9 +2,11 @@ package com.example.pharmacyservice.service.serviceimpl;
 
 import com.example.pharmacyservice.client.AdminClient;
 import com.example.pharmacyservice.client.MedicalClient;
+import com.example.pharmacyservice.client.TransactionServiceClient;
 import com.example.pharmacyservice.dto.MedicalDto;
 import com.example.pharmacyservice.dto.PharmacyRequest;
 import com.example.pharmacyservice.dto.PharmacyResponse;
+import com.example.pharmacyservice.dto.TransactionDto;
 import com.example.pharmacyservice.exception.PharmacyNotFoundException;
 import com.example.pharmacyservice.mapper.GlobalMapper;
 import com.example.pharmacyservice.module.Pharmacy;
@@ -20,12 +22,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PharmacyServiceImpl implements PharmacyService , MedicalClient {
+public class PharmacyServiceImpl implements PharmacyService , MedicalClient, TransactionServiceClient {
     private final PharmacyRepository pharmacyRepository;
     private  final GlobalMapper globalMapper;
     private final GlobalResponseEntity globalResponseEntity;
     private final AdminClient adminClient;
     private final MedicalClient medicalClient;
+    private final TransactionServiceClient transactionServiceClient;
 
     @Override
     public ResponseEntity<PharmacyResponse> registerPharmacy(PharmacyRequest pharmacyRequest) {
@@ -91,5 +94,16 @@ public class PharmacyServiceImpl implements PharmacyService , MedicalClient {
 
         // Call the MedicalClient to get medicines by pharmacy ID
         return medicalClient.getMedicinesByPharmacyId(pharmacyId);
+    }
+
+
+    @Override
+    public List<TransactionDto> getTransactionByPharmacyId(Long pharmacyId) {
+        // Ensure the pharmacy exists
+        pharmacyRepository.findById(String.valueOf(pharmacyId))
+                .orElseThrow(() -> new PharmacyNotFoundException("Pharmacy with ID: " + pharmacyId + " Not Found"));
+
+        // Call the TransactionServiceClient to get transaction by pharmacy ID
+        return transactionServiceClient.getTransactionByPharmacyId(pharmacyId);
     }
 }
